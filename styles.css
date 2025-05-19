@@ -380,7 +380,8 @@ button {
 
 /* Sidebar */
 #sidebar {
-  transition: width 0.3s ease-in-out;
+  transition: transform 0.3s ease, width 0.3s ease-in-out;
+  z-index: 40;
 }
 
 .sidebar-collapsed {
@@ -554,6 +555,8 @@ button {
     top: 0;
     left: 0;
     z-index: 40;
+    height: 100%;
+    width: 250px !important;
     transform: translateX(-100%);
   }
   
@@ -562,6 +565,18 @@ button {
   }
   
   #mobile-sidebar-toggle {
+    display: block !important;
+  }
+  
+  #mobile-overlay {
+    display: none;
+  }
+  
+  #mobile-overlay.hidden {
+    display: none;
+  }
+  
+  #sidebar.sidebar-mobile-open + #mobile-overlay {
     display: block;
   }
 }
