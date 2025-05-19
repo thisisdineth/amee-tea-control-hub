@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,21 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Tea-themed colors
+				tea: {
+					50: '#f0f9f0',
+					100: '#dcf0dc',
+					200: '#b9e1bc',
+					300: '#8fcb95',
+					400: '#5fb06c',
+					500: '#3c9349',
+					600: '#2c763a',
+					700: '#245e31',
+					800: '#1f4b29',
+					900: '#1a3e23',
+					950: '#0d2413',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -89,6 +104,9 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
 			}
 		}
 	},
