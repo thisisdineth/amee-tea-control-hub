@@ -7,17 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function updateIcon(btn, collapsed) {
     if (!btn) return;
-    var svg = btn.querySelector('svg');
-    if (!svg) return;
-
-    var path = svg.querySelector('path');
-    if (!path) {
-      path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      svg.appendChild(path);
+    var icon = btn.querySelector('i');
+    if (!icon) {
+      icon = document.createElement('i');
+      btn.innerHTML = '';
+      btn.appendChild(icon);
     }
-
-    var d = collapsed ? 'm9 18 6-6-6-6' : 'm15 18-6-6 6-6';
-    path.setAttribute('d', d);
+    icon.className = collapsed ? 'fa fa-chevron-right' : 'fa fa-chevron-left';
   }
 
   if (toggleBtn && sidebar && sidebar.classList) {
