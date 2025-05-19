@@ -24,4 +24,21 @@
             if (icon) icon.setAttribute('d', 'm9 18 6-6-6-6');
           });
         }
+        // Update greeting based on current time
+        const greetingElement = document.getElementById('greeting');
+        if (greetingElement) {
+          const now = new Date();
+          const hours = now.getHours();
+          let greetingText = 'Hello';
+
+          if (hours < 12) {
+            greetingText = 'Good Morning';
+          } else if (hours < 18) {
+            greetingText = 'Good Afternoon';
+          } else {
+            greetingText = 'Good Evening';
+          }
+
+          greetingElement.textContent = `${greetingText}, Administrator!`;
+        }
       });
