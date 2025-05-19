@@ -86,7 +86,20 @@ button {
 .flex-1 {
   flex: 1;
 }
-
+.mobile-sidebar-toggle {
+  position: fixed;
+  top: 1.25rem;         /* same as top-5 in Tailwind (5 x 0.25rem) */
+  right: 1.25rem;       /* same as right-5 */
+  z-index: 50;
+  padding: 0.5rem;      /* same as p-2 */
+  border-radius: 9999px; /* fully rounded like rounded-full */
+  background-color: #05ae05; /* same as Tailwind's bg-primary (blue-500, adjust if needed) */
+  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* same as shadow-md */
+  float: right; /* optional based on your layout */
+  border: none;
+  cursor: pointer;
+}
 .flex-col {
   flex-direction: column;
 }

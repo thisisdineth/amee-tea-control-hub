@@ -7,32 +7,23 @@ document.addEventListener('DOMContentLoaded', function() {
   const mobileToggleBtn = document.getElementById('mobile-sidebar-toggle');
   const mobileOverlay = document.getElementById('mobile-overlay');
   
-  // Check if we're on mobile
-  const isMobile = window.innerWidth < 769;
-  
-  // Desktop sidebar toggle - only enable on mobile
+  // Desktop sidebar toggle
   if (toggleBtn) {
-    toggleBtn.style.display = isMobile ? 'block' : 'none';
-    
     toggleBtn.addEventListener('click', function() {
-      if (isMobile) {
-        sidebar.classList.toggle('sidebar-collapsed');
-        
-        // Update toggle icon
-        const icon = this.querySelector('svg');
-        if (sidebar.classList.contains('sidebar-collapsed')) {
-          icon.innerHTML = '<path d="m9 18 6-6-6-6"/>';
-        } else {
-          icon.innerHTML = '<path d="m15 18-6-6 6-6"/>';
-        }
+      sidebar.classList.toggle('sidebar-collapsed');
+      
+      // Update toggle icon
+      const icon = this.querySelector('svg');
+      if (sidebar.classList.contains('sidebar-collapsed')) {
+        icon.innerHTML = '<path d="m9 18 6-6-6-6"/>';
+      } else {
+        icon.innerHTML = '<path d="m15 18-6-6 6-6"/>';
       }
     });
   }
   
-  // Mobile sidebar toggle - only enabled on mobile
+  // Mobile sidebar toggle
   if (mobileToggleBtn) {
-    mobileToggleBtn.style.display = isMobile ? 'block' : 'none';
-    
     mobileToggleBtn.addEventListener('click', function() {
       sidebar.classList.toggle('sidebar-mobile-open');
       mobileOverlay.classList.toggle('hidden');
@@ -60,23 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
-  // Handle window resize
-  window.addEventListener('resize', function() {
-    const newIsMobile = window.innerWidth < 769;
-    
-    // Only update display if the state changed
-    if (newIsMobile !== isMobile) {
-      if (toggleBtn) toggleBtn.style.display = newIsMobile ? 'block' : 'none';
-      if (mobileToggleBtn) mobileToggleBtn.style.display = newIsMobile ? 'block' : 'none';
-      
-      // Reset mobile sidebar state when switching to desktop
-      if (!newIsMobile) {
-        sidebar.classList.remove('sidebar-mobile-open');
-        mobileOverlay.classList.add('hidden');
-      }
-    }
-  });
 
   // Set greeting based on time of day
   const greeting = document.getElementById('greeting');
