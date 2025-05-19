@@ -363,3 +363,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initial Load ---
     fetchExistingTableNames(); // Fetch table names when the page loads and DOM is ready
 });
+// --- Navbar Mobile Menu Toggle ---
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+            // Toggle the 'hidden' class on the mobile menu
+            mobileMenu.classList.toggle('hidden');
+        });
+        const mobileNavLinks = mobileMenu.querySelectorAll('a.mobile-navbar-item');
+
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // Check if the menu is currently visible before trying to hide it
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+    } else {
+        if (!mobileMenuButton) {
+            console.warn('Mobile menu button with ID "mobile-menu-button" not found.');
+        }
+        if (!mobileMenu) {
+            console.warn('Mobile menu with ID "mobile-menu" not found.');
+        }
+    }

@@ -71,18 +71,18 @@ body {
     min-height: 100vh;
 }
 
-/* === Top Navbar === */
+/* === Top Navbar (General Styles) === */
 #top-navbar {
     background-color: var(--navbar-background-color);
     border-bottom: 1px solid var(--navbar-border-color);
     box-shadow: var(--shadow-sm);
-    position: sticky; /* Make navbar sticky */
+    position: sticky;
     top: 0;
-    z-index: 1000; /* Ensure it's above other content */
+    z-index: 1000;
     width: 100%;
 }
 
-#top-navbar .container { /* Assumes a .container class for max-width and centering */
+#top-navbar .container {
     max-width: 1280px;
     margin-left: auto;
     margin-right: auto;
@@ -100,7 +100,7 @@ body {
 #top-navbar .text-navbar-text { color: var(--navbar-text-color); }
 #top-navbar a { text-decoration: none; }
 
-/* Desktop Navbar Links */
+/* Desktop Navbar Links Items Styling */
 .navbar-item {
     padding: 0.75rem 1rem;
     color: var(--navbar-text-color);
@@ -111,39 +111,20 @@ body {
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
     font-size: 0.9rem;
 }
-
 .navbar-item i {
     margin-right: 0.5rem;
-    font-size: 1rem; /* Adjust icon size if needed */
+    font-size: 1rem;
 }
-
 .navbar-item:hover,
-.navbar-item.active { /* Add .active class to the current page link via JS or backend */
+.navbar-item.active {
     background-color: var(--navbar-hover-bg);
     color: var(--navbar-hover-text);
 }
 
-/* Mobile Menu Button */
-#mobile-menu-button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-    color: var(--navbar-text-color);
-}
-#mobile-menu-button i {
-    font-size: 1.5rem; /* Hamburger icon size */
-}
-
-/* Mobile Menu Dropdown */
-#mobile-menu {
-    background-color: var(--navbar-background-color); /* Can be slightly different if desired */
-    border-top: 1px solid var(--navbar-border-color);
-    box-shadow: var(--shadow-md);
-}
-
+/* Mobile Navbar Link Items Styling */
 .mobile-navbar-item {
-    display: flex; /* Use flex for icon alignment */
+    display: inline-block;
+    white-space: nowrap;
     align-items: center;
     padding: 0.85rem 1rem;
     color: var(--navbar-text-color);
@@ -151,42 +132,71 @@ body {
     border-bottom: 1px solid var(--navbar-border-color);
     font-size: 0.95rem;
 }
-.mobile-navbar-item:last-child {
-    border-bottom: none;
-}
-
-.mobile-navbar-item i {
-    margin-right: 0.75rem;
-    width: 20px; /* Ensure consistent icon spacing */
-    text-align: center;
-}
-
-.mobile-navbar-item:hover,
-.mobile-navbar-item.active {
+.mobile-navbar-item:last-child { border-bottom: none; }
+.mobile-navbar-item i { margin-right: 0.75rem; width: 20px; text-align: center; }
+.mobile-navbar-item:hover, .mobile-navbar-item.active {
     background-color: var(--navbar-hover-bg);
     color: var(--navbar-hover-text);
 }
 
-/* Visibility classes (commonly used with JS) */
-.hidden { display: none !important; } /* Important to override other display properties */
 
-@media (min-width: 768px) { /* md breakpoint */
-    #mobile-menu-button { display: none; }
-    #mobile-menu { display: none !important; } /* Ensure mobile menu is hidden on desktop */
-    #top-navbar .md-flex-items-center-space-x-3 {
-        display: flex;
-        align-items: center;
-    }
-    #top-navbar .md-flex-items-center-space-x-3 > *:not(:last-child) {
-        margin-right: 0.5rem; /* Space between desktop nav items */
-    }
+/* === NAVBAR VISIBILITY CONTROL (REVISED) === */
+
+/* Desktop Navigation Links Container */
+#desktop-nav-links {
+    display: none; /* Hidden by default (mobile-first) */
+    align-items: center; /* From original items-center class */
 }
-@media (max-width: 767.98px) { /* Hide desktop links on mobile */
-    #top-navbar .md-flex-items-center-space-x-3 {
-        display: none;
-    }
+/* Apply spacing if items are direct children and it's a flex container */
+#desktop-nav-links > .navbar-item:not(:last-child) {
+    margin-right: 0.5rem; /* Adjust as needed for spacing between desktop links */
 }
 
+/* Mobile Menu Button Container */
+#mobile-menu-button-container {
+    display: block; /* Shown by default on mobile */
+}
+#mobile-menu-button { /* Styling for the button itself */
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: var(--navbar-text-color);
+}
+#mobile-menu-button i { font-size: 1.5rem; }
+
+
+/* Mobile Menu Dropdown (the actual menu that slides/appears) */
+#mobile-menu {
+    background-color: var(--navbar-background-color);
+    border-top: 1px solid var(--navbar-border-color);
+    box-shadow: var(--shadow-md);
+    /* The 'hidden' class (toggled by JS) will handle its initial display:none state */
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* Utility class for JS toggling visibility */
+.hidden {
+    display: none !important;
+}
+
+/* --- Media Queries for Navbar Visibility --- */
+
+/* Medium screens and up (Desktop View - 768px and above) */
+@media (min-width: 768px) {
+    #desktop-nav-links {
+        display: flex !important; /* Show desktop links */
+    }
+
+    #mobile-menu-button-container {
+        display: none !important; /* Hide mobile menu button container */
+    }
+
+    #mobile-menu {
+        display: none !important; /* Ensure mobile dropdown is also hidden on desktop */
+    }
+}
 
 /* === Main Content Area === */
 main {
