@@ -16,59 +16,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const db = firebase.database(); // Use Realtime Database
 
-    // --- DOM Elements ---
-    // Navbar
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    // Table Creation Modal
+    // DOM Elements
     const addNewTableBtn = document.getElementById('addNewTableBtn');
     const newTableModal = document.getElementById('newTableModal');
-    const closeButton = document.querySelector('.modal .close-button');
+    const closeButton = document.querySelector('.modal .close-button'); // Specific selector
     const tableNameInput = document.getElementById('tableNameInput');
     const existingTableSuggestions = document.getElementById('existingTableSuggestions');
     const createOrUpdateTableBtn = document.getElementById('createOrUpdateTableBtn');
-
-    // Current Table Display
     const currentTableSection = document.getElementById('currentTableSection');
     const currentTableNameDisplay = document.getElementById('currentTableName');
     const materialTableBody = document.getElementById('materialTableBody');
-
-    // Add Row Form
     const addRowForm = document.getElementById('addRowForm');
-
-    // All Tables List
     const allTablesList = document.getElementById('allTablesList');
     const searchTableInput = document.getElementById('searchTableInput');
 
     let activeTableName = null;
     let existingTableNames = [];
 
-    // --- Mobile Menu Toggle ---
-    if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-
-        // Optional: Close mobile menu when a link is clicked
-        const mobileNavLinks = mobileMenu.querySelectorAll('a.mobile-navbar-item');
-        mobileNavLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (!mobileMenu.classList.contains('hidden')) {
-                    mobileMenu.classList.add('hidden');
-                }
-            });
-        });
-    }
-
-
     // --- Modal Functionality ---
     if (addNewTableBtn) {
         addNewTableBtn.onclick = () => {
-            if (newTableModal) newTableModal.style.display = 'flex'; // Use flex to enable centering
+            if (newTableModal) newTableModal.style.display = 'block';
             if (tableNameInput) tableNameInput.value = '';
             if (existingTableSuggestions) existingTableSuggestions.innerHTML = '';
-            fetchExistingTableNames(); // Fetch and show suggestions
+            fetchExistingTableNames();
         };
     }
 
@@ -113,9 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
             existingTableNames = data ? Object.keys(data) : [];
         } catch (error) {
             console.error("Error fetching table names: ", error);
-            existingTableNames = [];
+            existingTableNames = []; // Ensure it's an array on error
         }
-        populateAllTablesList();
+        populateAllTablesList(); // Always attempt to populate the list
     }
 
     // --- Create or Update Table (Metadata in RTDB) ---
@@ -129,16 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             activeTableName = tableName;
-            if (currentTableNameDisplay) currentTableNameDisplay.textContent = `Current Table: ${tableName}`;
+            if (currentTableNameDisplay) currentTableNameDisplay.textContent = tableName;
             if (currentTableSection) currentTableSection.classList.remove('hidden');
             if (newTableModal) newTableModal.style.display = 'none';
 
             if (!existingTableNames.includes(tableName)) {
                 try {
-                    // Create metadata node for the new table
                     await db.ref(`inventoryTables/${tableName}`).set({ createdAt: firebase.database.ServerValue.TIMESTAMP });
-                    existingTableNames.push(tableName);
-                    populateAllTablesList();
+                    existingTableNames.push(tableName); // Update local cache
+                    populateAllTablesList(); // Refresh the list at the bottom
                     console.log(`Table metadata for '${tableName}' created.`);
                 } catch (error) {
                     console.error("Error creating table metadata: ", error);
@@ -155,20 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!tableName || !materialTableBody) return;
         materialTableBody.innerHTML = ''; // Clear existing rows
         try {
-            // Order by inflowDate or a general transaction date if you have one
-            const snapshot = await db.ref(tableName).orderByChild('inflowDate').once('value');
+            const snapshot = await db.ref(tableName).orderByChild('inflowDate').once('value'); // Assuming inflowDate is primary sort key
             if (snapshot.exists()) {
-                snapshot.forEach(childSnapshot => {
+                snapshot.forEach(childSnapshot => { // .forEach maintains order from orderByChild
                     renderRow(childSnapshot.key, childSnapshot.val());
                 });
             } else {
                 console.log(`No data found for table ${tableName}`);
-                // Optionally display a message in the table:
-                // const row = materialTableBody.insertRow();
-                // const cell = row.insertCell();
-                // cell.colSpan = 16; // Adjust to your total number of data columns + actions
-                // cell.textContent = 'No data available in this table.';
-                // cell.style.textAlign = 'center';
             }
         } catch (error) {
             console.error(`Error loading data for table ${tableName}: `, error);
@@ -176,56 +139,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Render a Single Row in the Table ---
-    // Structure: Date (main), Inflow (6), Outflow (5), Balance (3), Actions
     function renderRow(docId, data) {
         if (!materialTableBody) return;
         const row = materialTableBody.insertRow();
         row.setAttribute('data-id', docId);
 
-        // 1. Main Date (Typically Inflow Date or a general transaction date)
-        row.insertCell().textContent = data.inflowDate || data.transactionDate || ''; // Prioritize inflowDate
+        // Match cells to your table structure (1 main date + 6 inflow + 5 outflow + 3 balance + 1 actions = 16 cells)
+        row.insertCell().textContent = data.inflowDate || ''; // Main date, assumed to be inflow date
 
-        // Inflow Data (6 cells)
+        // Inflow
         row.insertCell().textContent = data.inflowSupplier || '';
         row.insertCell().textContent = data.inflowEstate || '';
         row.insertCell().textContent = data.inflowGrade || '';
-        row.insertCell().textContent = data.inflowBagWeight ? parseFloat(data.inflowBagWeight).toFixed(2) : '';
+        row.insertCell().textContent = data.inflowBagWeight || '';
         row.insertCell().textContent = data.inflowBags || '';
-        const totalInflowWeight = (data.inflowBagWeight && data.inflowBags)
-            ? (parseFloat(data.inflowBagWeight) * parseInt(data.inflowBags)).toFixed(2)
-            : (data.inflowTotalWeight ? parseFloat(data.inflowTotalWeight).toFixed(2) : '');
+        const totalInflowWeight = (parseFloat(data.inflowBagWeight) && parseInt(data.inflowBags))
+            ? (parseFloat(data.inflowBagWeight) * parseInt(data.inflowBags)).toFixed(2) // .toFixed(2) for consistency
+            : (data.inflowTotalWeight || '');
         row.insertCell().textContent = totalInflowWeight;
 
-        // Outflow Data (5 cells: Date, Estate, Grade, Product, Weight)
-        row.insertCell().textContent = data.outflowDate || ''; // Specific date for outflow
+        // Outflow
+        row.insertCell().textContent = data.outflowDate || ''; // Outflow Date
         row.insertCell().textContent = data.outflowEstate || '';
         row.insertCell().textContent = data.outflowGrade || '';
         row.insertCell().textContent = data.outflowProduct || '';
-        row.insertCell().textContent = data.outflowWeight ? parseFloat(data.outflowWeight).toFixed(2) : '';
+        row.insertCell().textContent = data.outflowWeight || '';
 
-        // Balance Data (3 cells)
+        // Balance
         row.insertCell().textContent = data.balanceEstate || '';
         row.insertCell().textContent = data.balanceGrade || '';
-        row.insertCell().textContent = data.balanceQty ? parseFloat(data.balanceQty).toFixed(2) : '';
+        row.insertCell().textContent = data.balanceQty || '';
 
-        // Actions Cell
+        // Actions
         const actionsCell = row.insertCell();
         actionsCell.classList.add('actions');
-
         const editBtn = document.createElement('button');
         editBtn.textContent = 'Edit';
-        editBtn.classList.add('edit-btn', 'btn'); // Using btn class for styling consistency
+        editBtn.classList.add('edit-btn');
         editBtn.onclick = () => editRow(docId, data);
 
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete';
-        deleteBtn.classList.add('delete-btn', 'btn'); // Using btn class
+        deleteBtn.classList.add('delete-btn');
         deleteBtn.onclick = () => deleteRow(docId);
 
         actionsCell.appendChild(editBtn);
         actionsCell.appendChild(deleteBtn);
     }
-
 
     // --- Add New Row to RTDB ---
     if (addRowForm) {
@@ -238,116 +198,89 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const inflowBagWeightVal = parseFloat(document.getElementById('inflowBagWeight').value) || 0;
             const inflowBagsVal = parseInt(document.getElementById('inflowBags').value) || 0;
-            let inflowTotalWeightVal = null;
-            if (inflowBagWeightVal > 0 && inflowBagsVal > 0) {
-                inflowTotalWeightVal = (inflowBagWeightVal * inflowBagsVal).toFixed(2);
-            }
-
+            const inflowTotalWeightVal = inflowBagWeightVal * inflowBagsVal;
 
             const rowData = {
-                // Main transaction date - typically the inflow date if it's primarily an inflow record
-                inflowDate: document.getElementById('inflowDate').value,
-
-                // Inflow fields
-                inflowSupplier: document.getElementById('inflowSupplier').value.trim() || null,
-                inflowEstate: document.getElementById('inflowEstate').value.trim() || null,
-                inflowGrade: document.getElementById('inflowGrade').value.trim() || null,
+                inflowDate: document.getElementById('inflowDate').value, // Main date for the transaction
+                inflowSupplier: document.getElementById('inflowSupplier').value,
+                inflowEstate: document.getElementById('inflowEstate').value,
+                inflowGrade: document.getElementById('inflowGrade').value,
                 inflowBagWeight: inflowBagWeightVal || null,
                 inflowBags: inflowBagsVal || null,
-                inflowTotalWeight: inflowTotalWeightVal,
+                inflowTotalWeight: inflowTotalWeightVal ? inflowTotalWeightVal.toFixed(2) : null,
 
-                // Outflow fields (includes its own date now)
-                outflowDate: document.getElementById('outflowDate').value || null, // Allow empty if no outflow
-                outflowEstate: document.getElementById('outflowEstate').value.trim() || null,
-                outflowGrade: document.getElementById('outflowGrade').value.trim() || null,
-                outflowProduct: document.getElementById('outflowProduct').value.trim() || null,
+                outflowDate: document.getElementById('outflowDate').value, // Specific date for outflow if different
+                outflowEstate: document.getElementById('outflowEstate').value,
+                outflowGrade: document.getElementById('outflowGrade').value,
+                outflowProduct: document.getElementById('outflowProduct').value,
                 outflowWeight: parseFloat(document.getElementById('outflowWeight').value) || null,
 
-                // Balance fields
-                balanceEstate: document.getElementById('balanceEstate').value.trim() || null,
-                balanceGrade: document.getElementById('balanceGrade').value.trim() || null,
+                balanceEstate: document.getElementById('balanceEstate').value,
+                balanceGrade: document.getElementById('balanceGrade').value,
                 balanceQty: parseFloat(document.getElementById('balanceQty').value) || null,
-
-                createdAt: firebase.database.ServerValue.TIMESTAMP
+                createdAt: firebase.database.ServerValue.TIMESTAMP // Timestamp for record creation
             };
 
-            // Basic validation: ensure at least an inflowDate is present
-            if (!rowData.inflowDate) {
-                alert('Inflow Date is required.');
-                document.getElementById('inflowDate').focus();
-                return;
-            }
-
             try {
-                const newRowRef = db.ref(activeTableName).push();
+                const newRowRef = db.ref(activeTableName).push(); // Generates a unique ID
                 await newRowRef.set(rowData);
-                loadTableData(activeTableName);
+                // renderRow(newRowRef.key, rowData); // Optimistic render
+                loadTableData(activeTableName); // Or reload to ensure server values like timestamp are correct
                 addRowForm.reset();
                 console.log("Row added with ID: ", newRowRef.key);
             } catch (error) {
                 console.error("Error adding new row: ", error);
-                alert('Error adding row. Check console for details.');
+                alert('Error adding row.');
             }
         });
     }
 
     // --- Edit Row (RTDB) ---
-    // This function uses prompts. For better UX, consider a modal or populating the addRowForm.
     function editRow(docId, currentData) {
-        if (!activeTableName) return;
+        // This is a basic prompt-based edit. For a better UX, populate the addRowForm or a dedicated edit modal.
+        const newInflowSupplier = prompt("Enter new Inflow Supplier:", currentData.inflowSupplier || "");
+        // ... prompt for ALL other editable fields from your form ...
+        const newOutflowProduct = prompt("Enter new Outflow Product:", currentData.outflowProduct || "");
+        const newInflowDate = prompt("Enter new Inflow Date (YYYY-MM-DD):", currentData.inflowDate || "");
 
-        // Create a temporary object to hold new values from prompts
-        const newData = { ...currentData }; // Clone current data
 
-        // Prompt for each field, pre-filling with current data
-        // It's verbose, but clear. A loop or a more structured approach could be used for many fields.
+        const updatedFields = {};
+        let hasChanges = false;
 
-        newData.inflowDate = prompt("Enter Inflow Date (YYYY-MM-DD):", currentData.inflowDate || "") || currentData.inflowDate;
+        // Example for one field, repeat for all fields you want to make editable
+        if (newInflowSupplier !== null && newInflowSupplier !== (currentData.inflowSupplier || "")) {
+            updatedFields.inflowSupplier = newInflowSupplier;
+            hasChanges = true;
+        }
+        if (newOutflowProduct !== null && newOutflowProduct !== (currentData.outflowProduct || "")) {
+            updatedFields.outflowProduct = newOutflowProduct;
+            hasChanges = true;
+        }
+        if (newInflowDate !== null && newInflowDate !== (currentData.inflowDate || "")) {
+            updatedFields.inflowDate = newInflowDate; // Update the date field
+            hasChanges = true;
+        }
+        // ... and so on for all other fields from your form ...
 
-        newData.inflowSupplier = prompt("Enter Inflow Supplier:", currentData.inflowSupplier || "") || currentData.inflowSupplier;
-        newData.inflowEstate = prompt("Enter Inflow Estate:", currentData.inflowEstate || "") || currentData.inflowEstate;
-        newData.inflowGrade = prompt("Enter Inflow Grade:", currentData.inflowGrade || "") || currentData.inflowGrade;
-        newData.inflowBagWeight = parseFloat(prompt("Enter Inflow Bag Weight (Kg):", currentData.inflowBagWeight || "0")) || currentData.inflowBagWeight;
-        newData.inflowBags = parseInt(prompt("Enter No. of Inflow Bags:", currentData.inflowBags || "0")) || currentData.inflowBags;
-        // Recalculate inflowTotalWeight if components change
-        if (newData.inflowBagWeight && newData.inflowBags) {
-            newData.inflowTotalWeight = (newData.inflowBagWeight * newData.inflowBags).toFixed(2);
-        } else {
-            newData.inflowTotalWeight = currentData.inflowTotalWeight; // or prompt if it's manually entered
+        if (!hasChanges) {
+            console.log("No changes made or dialog cancelled.");
+            return; // User cancelled or made no changes
         }
 
-
-        newData.outflowDate = prompt("Enter Outflow Date (YYYY-MM-DD):", currentData.outflowDate || "") || currentData.outflowDate;
-        newData.outflowEstate = prompt("Enter Outflow Estate:", currentData.outflowEstate || "") || currentData.outflowEstate;
-        newData.outflowGrade = prompt("Enter Outflow Grade:", currentData.outflowGrade || "") || currentData.outflowGrade;
-        newData.outflowProduct = prompt("Enter Outflow Product:", currentData.outflowProduct || "") || currentData.outflowProduct;
-        newData.outflowWeight = parseFloat(prompt("Enter Outflow Weight (Kg):", currentData.outflowWeight || "0")) || currentData.outflowWeight;
-
-        newData.balanceEstate = prompt("Enter Balance Estate:", currentData.balanceEstate || "") || currentData.balanceEstate;
-        newData.balanceGrade = prompt("Enter Balance Grade:", currentData.balanceGrade || "") || currentData.balanceGrade;
-        newData.balanceQty = parseFloat(prompt("Enter Balance Qty (Kg):", currentData.balanceQty || "0")) || currentData.balanceQty;
+        // Construct the full update object, preserving non-updated fields
+        const updatePayload = { ...currentData, ...updatedFields, updatedAt: firebase.database.ServerValue.TIMESTAMP };
 
 
-        // Check if any actual changes were made (simple JSON string comparison)
-        if (JSON.stringify(currentData) === JSON.stringify(newData)) {
-            console.log("No changes made or dialog cancelled for all fields.");
-            return;
-        }
-
-        // Add/update the 'updatedAt' timestamp
-        newData.updatedAt = firebase.database.ServerValue.TIMESTAMP;
-
-        db.ref(`${activeTableName}/${docId}`).update(newData)
+        db.ref(`${activeTableName}/${docId}`).update(updatePayload)
             .then(() => {
                 console.log("Row updated successfully");
                 loadTableData(activeTableName); // Reload to show changes
             })
             .catch(error => {
                 console.error("Error updating row: ", error);
-                alert('Error updating row. Check console for details.');
+                alert('Error updating row.');
             });
     }
-
 
     // --- Delete Row (RTDB) ---
     async function deleteRow(docId) {
@@ -356,10 +289,10 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await db.ref(`${activeTableName}/${docId}`).remove();
                 console.log("Row deleted successfully");
-                loadTableData(activeTableName); // Reload table
+                loadTableData(activeTableName); // Reload table to reflect deletion
             } catch (error) {
                 console.error("Error deleting row: ", error);
-                alert('Error deleting row. Check console for details.');
+                alert('Error deleting row.');
             }
         }
     }
@@ -377,18 +310,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.textContent = tableName;
                 li.onclick = () => {
                     activeTableName = tableName;
-                    if (currentTableNameDisplay) currentTableNameDisplay.textContent = `Current Table: ${tableName}`;
+                    if (currentTableNameDisplay) currentTableNameDisplay.textContent = tableName;
                     if (currentTableSection) currentTableSection.classList.remove('hidden');
                     loadTableData(tableName);
-                    window.scrollTo({ top: currentTableSection.offsetTop - 80, behavior: 'smooth' }); // Scroll to table, considering navbar height
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 };
 
                 const deleteTableBtn = document.createElement('button');
                 deleteTableBtn.textContent = 'Delete Table';
-                deleteTableBtn.classList.add('btn', 'btn-danger', 'btn-sm'); // Added some styling classes
-                deleteTableBtn.style.marginLeft = '10px'; // Add some space
                 deleteTableBtn.onclick = (event) => {
-                    event.stopPropagation(); // Prevent li click event
+                    event.stopPropagation(); // Prevent li click event when button is clicked
                     deleteEntireTable(tableName);
                 };
                 li.appendChild(deleteTableBtn);
@@ -400,11 +331,11 @@ document.addEventListener('DOMContentLoaded', () => {
     async function deleteEntireTable(tableNameToDelete) {
         if (confirm(`Are you sure you want to delete the entire table "${tableNameToDelete}" and all its data? This cannot be undone.`)) {
             try {
-                // 1. Delete all data within the table's node
+                // 1. Delete all data within the table's path in RTDB
                 await db.ref(tableNameToDelete).remove();
                 console.log(`All data in table '${tableNameToDelete}' deleted.`);
 
-                // 2. Delete the table metadata from 'inventoryTables'
+                // 2. Delete the table metadata from 'inventoryTables' in RTDB
                 await db.ref(`inventoryTables/${tableNameToDelete}`).remove();
                 console.log(`Metadata for table '${tableNameToDelete}' deleted.`);
 
@@ -415,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (currentTableSection) currentTableSection.classList.add('hidden');
                     activeTableName = null;
                     if (currentTableNameDisplay) currentTableNameDisplay.textContent = '';
-                    if (materialTableBody) materialTableBody.innerHTML = ''; // Clear table body
                 }
                 alert(`Table "${tableNameToDelete}" deleted successfully.`);
             } catch (error) {
@@ -431,5 +361,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Initial Load ---
-    fetchExistingTableNames(); // Fetch table names when the page loads
+    fetchExistingTableNames(); // Fetch table names when the page loads and DOM is ready
 });
