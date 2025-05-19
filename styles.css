@@ -590,3 +590,18 @@ button {
     display: block;
   }
 }
+
+/* Desktop sidebar - always show sidebar, hide toggle buttons */
+@media (min-width: 769px) {
+  #toggle-sidebar {
+    display: none !important;
+  }
+  
+  #mobile-sidebar-toggle {
+    display: none !important;
+  }
+  
+  #sidebar {
+    transform: none !important;
+  }
+}

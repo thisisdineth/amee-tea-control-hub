@@ -106,10 +106,10 @@ const Sidebar = () => {
         <div className="p-4 flex items-center justify-between border-b border-sidebar-border">
           <div className="flex items-center gap-2">
             <img src="/tealeaf.svg" alt="Amee-Tea Logo" className="h-8 w-8" />
-            {!collapsed && <h2 className="font-bold text-lg text-sidebar-foreground">Amee-Tea</h2>}
           </div>
           
-          {!isMobile && (
+          {/* Only show toggle button on desktop if needed for testing */}
+          {!isMobile && false && (
             <Button
               variant="ghost"
               size="icon"
