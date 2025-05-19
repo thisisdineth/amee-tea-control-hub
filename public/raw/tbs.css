@@ -1,0 +1,488 @@
+/* styles.css */
+
+/* --- CSS Variables for Theming and Consistency --- */
+:root {
+    --primary-color: #4A90E2; /* A modern, friendly blue */
+    --primary-hover-color: #357ABD;
+    --secondary-color: #50E3C2; /* A vibrant accent */
+    --secondary-hover-color: #38BFA0;
+    --danger-color: #D0021B; /* Clear red for destructive actions */
+    --danger-hover-color: #A00113;
+    --warning-color: #f0ad4e;
+    --warning-hover-color: #ec971f;
+    --light-gray-color: #f8f9fa;
+    --medium-gray-color: #e9ecef;
+    --dark-gray-color: #6c757d;
+    --text-color: #333;
+    --text-light-color: #555;
+    --background-color: #ffffff;
+    --surface-color: #ffffff; /* For cards, modals etc. */
+    --border-color: #dee2e6;
+    --border-radius: 6px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --box-shadow-light: 0 2px 6px rgba(0, 0, 0, 0.05);
+    --font-family-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+}
+
+/* --- Global Resets and Base Styles --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family-sans-serif);
+    line-height: 1.6;
+    background-color: var(--light-gray-color); /* Light background for the whole page */
+    color: var(--text-color);
+    margin: 0; /* Ensure no default body margin */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    width: 95%; /* More fluid width */
+    max-width: 1200px; /* Max width for larger screens */
+    margin: var(--spacing-md) auto;
+    background-color: var(--surface-color);
+    padding: var(--spacing-md);
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius);
+}
+
+h1, h2, h3, h4 {
+    color: var(--text-color);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.3;
+}
+
+h1 {
+    font-size: 2em; /* Adjust as needed */
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+h2 {
+    font-size: 1.6em;
+    text-align: center;
+    border-bottom: 1px solid var(--medium-gray-color);
+    padding-bottom: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+}
+h3 {
+    font-size: 1.3em;
+    margin-top: var(--spacing-md);
+}
+h4 {
+    font-size: 1.1em;
+    color: var(--text-light-color);
+}
+
+
+/* --- Button Styling --- */
+button,
+.button { /* Added a .button class for anchor tags styled as buttons */
+    background-color: var(--primary-color);
+    color: white;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none; /* For .button class on anchor tags */
+    display: inline-block; /* For .button class on anchor tags */
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+    box-shadow: var(--box-shadow-light);
+}
+
+button:hover,
+.button:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-1px);
+}
+
+button:active,
+.button:active {
+    transform: translateY(0px);
+}
+
+/* Specific button types */
+.button-danger,
+button.delete-btn,
+#allTablesList li button { /* Targeting delete buttons specifically */
+    background-color: var(--danger-color);
+}
+.button-danger:hover,
+button.delete-btn:hover,
+#allTablesList li button:hover {
+    background-color: var(--danger-hover-color);
+}
+
+.button-warning,
+button.edit-btn {
+    background-color: var(--warning-color);
+}
+.button-warning:hover,
+button.edit-btn:hover {
+    background-color: var(--warning-hover-color);
+}
+
+.button-secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-color); /* Or white, depending on secondary color brightness */
+}
+.button-secondary:hover {
+    background-color: var(--secondary-hover-color);
+}
+
+
+/* --- Modal Styling --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000; /* Ensure modal is on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; /* Scroll within modal if content overflows */
+    background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+    padding: var(--spacing-md); /* Padding for smaller screens */
+    display: flex; /* Use flexbox for centering */
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--surface-color);
+    margin: auto; /* Flexbox handles centering */
+    padding: var(--spacing-lg);
+    border: none; /* Remove default border */
+    width: 90%;
+    max-width: 450px; /* Slightly wider modal */
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    text-align: left; /* Align content to left for better readability */
+    position: relative; /* For close button positioning */
+}
+
+.modal-content h2 {
+    text-align: left;
+    border-bottom: none;
+    margin-bottom: var(--spacing-md);
+}
+
+.close-button {
+    color: var(--dark-gray-color);
+    position: absolute; /* Position relative to modal-content */
+    top: var(--spacing-sm);
+    right: var(--spacing-md);
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 1; /* Ensure it aligns well */
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: var(--text-color);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* --- Form Elements (Inputs, Suggestions) --- */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="search"] { /* Added search type */
+    width: 100%; /* Full width for better mobile UX */
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="search"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 74, 144, 226), 0.25); /* Create --primary-color-rgb if needed or use hex */
+    outline: none;
+}
+
+#existingTableSuggestions {
+    list-style: none;
+    padding: 0;
+    margin: calc(-1 * var(--spacing-md)) 0 var(--spacing-md) 0; /* Adjust to align with input */
+    max-height: 150px; /* More space for suggestions */
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-top: none; /* Remove top border as it's under the input */
+    border-radius: 0 0 var(--border-radius) var(--border-radius); /* Match input corners */
+    background-color: var(--surface-color);
+    box-shadow: var(--box-shadow-light);
+}
+
+#existingTableSuggestions li {
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    border-bottom: 1px solid var(--medium-gray-color);
+    transition: background-color 0.15s ease;
+}
+
+#existingTableSuggestions li:last-child {
+    border-bottom: none;
+}
+
+#existingTableSuggestions li:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+
+/* --- Table Styling --- */
+.table-wrapper { /* Wrapper for horizontal scrolling on mobile */
+    overflow-x: auto;
+    margin-top: var(--spacing-md);
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+#materialTable {
+    width: 100%;
+    min-width: 900px; /* Set a min-width to force scrollbar when needed, adjust based on your columns */
+    border-collapse: collapse;
+    background-color: var(--surface-color); /* Table background */
+}
+
+#materialTable th,
+#materialTable td {
+    border: 1px solid var(--medium-gray-color);
+    padding: var(--spacing-sm) var(--spacing-md); /* Consistent padding */
+    text-align: left;
+    font-size: 0.9rem; /* Slightly smaller font for tables */
+    vertical-align: middle; /* Better vertical alignment */
+}
+
+#materialTable th {
+    background-color: var(--light-gray-color);
+    font-weight: 600; /* Bolder headers */
+    position: sticky; /* Sticky headers for better UX when scrolling vertically */
+    top: 0;
+    z-index: 10; /* Ensure headers are above table content */
+}
+
+#materialTable tr:nth-child(even) {
+    background-color: var(--light-gray-color); /* Subtle striping */
+}
+
+#materialTable tr:hover td { /* Hover effect on entire row's cells */
+    background-color: rgba(var(--primary-color-rgb, 74, 144, 226), 0.1); /* Light primary color tint */
+}
+
+.actions button {
+    margin: var(--spacing-xs); /* Use CSS variables for spacing */
+    padding: 6px 10px; /* Slightly adjusted padding */
+    font-size: 0.85rem; /* Smaller font for action buttons */
+    min-width: 60px; /* Ensure a minimum tappable width */
+    text-align: center;
+}
+.actions {
+    white-space: nowrap; /* Prevent action buttons from wrapping */
+    text-align: center; /* Center buttons in the cell */
+}
+
+
+/* --- Add Row Form Styling --- */
+.add-row-section {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: var(--light-gray-color); /* Slightly different background */
+    border-radius: var(--border-radius);
+    border: 1px solid var(--medium-gray-color);
+}
+.add-row-section h3{
+    text-align: left;
+}
+
+#addRowForm {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid for form inputs */
+    gap: var(--spacing-md); /* Gap between grid items */
+}
+
+#addRowForm h4 {
+    grid-column: 1 / -1; /* Make section headers span full width */
+    margin-top: var(--spacing-sm);
+    margin-bottom: 0; /* Reduce bottom margin as inputs have their own */
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--medium-gray-color);
+}
+
+/* Remove fixed width from form inputs, let grid handle it */
+#addRowForm input[type="text"],
+#addRowForm input[type="number"],
+#addRowForm input[type="date"] {
+    width: 100%; /* Inputs take full width of their grid cell */
+    margin: 0; /* Remove individual margins, use grid gap */
+}
+
+#addRowForm button[type="submit"] {
+    grid-column: 1 / -1; /* Make submit button span full width */
+    margin-top: var(--spacing-md);
+    width: auto; /* Or max-width: 200px; margin-left: auto; margin-right: auto; for centered button */
+    justify-self: start; /* Or center / end */
+}
+
+
+/* --- All Tables Section Styling --- */
+.all-tables-section {
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
+.all-tables-section h2{
+    text-align: left; /* Align heading to left */
+    border-bottom: none;
+}
+
+#searchTableInput {
+    width: 100%; /* Full width */
+    margin-bottom: var(--spacing-md);
+}
+
+#allTablesList {
+    list-style: none;
+    padding: 0;
+    display: grid; /* Use grid for a more structured list on larger screens */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+}
+
+#allTablesList li {
+    padding: var(--spacing-md);
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    margin-bottom: 0; /* Handled by grid gap */
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: var(--box-shadow-light);
+}
+
+#allTablesList li:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow);
+}
+
+#allTablesList li span { /* Assuming table name is in a span or direct text */
+    font-weight: 500;
+    margin-right: var(--spacing-sm);
+    word-break: break-word; /* Prevent long names from breaking layout */
+}
+
+#allTablesList li button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    flex-shrink: 0; /* Prevent button from shrinking */
+}
+
+
+/* --- Utility Classes --- */
+.hidden {
+    display: none !important; /* Ensure it overrides other display properties */
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+/* Add more as needed */
+
+
+/* --- Media Queries for Responsiveness --- */
+
+/* Smaller devices (tablets and large phones) */
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        margin: 0;
+        padding: var(--spacing-sm);
+        border-radius: 0; /* Full width, no radius on small screens */
+        box-shadow: none; /* Optional: remove shadow on mobile */
+    }
+
+    h1 {
+        font-size: 1.6em;
+    }
+    h2 {
+        font-size: 1.3em;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: var(--spacing-md);
+    }
+
+    /* Add Row Form: ensure inputs stack nicely if not already by grid */
+    #addRowForm {
+        grid-template-columns: 1fr; /* Stack inputs on smaller screens */
+    }
+
+    #materialTable th,
+    #materialTable td {
+        padding: var(--spacing-xs) var(--spacing-sm); /* Reduce padding in table cells */
+        font-size: 0.8rem; /* Further reduce font size for table content */
+    }
+
+    .actions button {
+        padding: var(--spacing-xs) 6px;
+        font-size: 0.75rem;
+        min-width: 50px;
+    }
+    .actions {
+        display: flex; /* Stack action buttons vertically if needed */
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+    .actions button {
+        width: 100%; /* Make buttons in actions column full width of cell */
+    }
+
+
+    #allTablesList {
+        grid-template-columns: 1fr; /* Stack table list items */
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px; /* Adjust base font size for very small screens */
+    }
+    h1 {
+        font-size: 1.4em;
+    }
+    h2 {
+        font-size: 1.2em;
+    }
+
+    .table-wrapper {
+        border-left: none;
+        border-right: none;
+    }
+}
